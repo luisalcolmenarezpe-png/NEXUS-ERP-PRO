@@ -13,8 +13,8 @@ jobs:
       - name: Checkout del código
         uses: actions/checkout@v4
 
-      - name: Configurar Java JDK
-        uses: actions/setup-java@v4
+      - name: Configurar Java JDK 17
+        uses: actions/setup-java@v5
         with:
           distribution: 'zulu'
           java-version: '17'
@@ -22,13 +22,16 @@ jobs:
       - name: Configurar Flutter SDK
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.19.x'
+          flutter-version: '3.22.x'
           channel: 'stable'
 
       - name: Obtener dependencias
         run: flutter pub get
 
-      - name: Compilar APK Android
+      - name: Generar archivos de plataforma Android
+        run: flutter create . --platforms=android
+
+      - name: Compilar APK Android Release
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
@@ -37,7 +40,7 @@ jobs:
             --dart-define=SUPABASE_URL=$SUPABASE_URL \
             --dart-define=SUPABASE_KEY=$SUPABASE_KEY
 
-      - name: Subir instalador APK
+      - name: Subir APK generado
         uses: actions/upload-artifact@v4
         with:
           name: nexus-erp-pro-apk
