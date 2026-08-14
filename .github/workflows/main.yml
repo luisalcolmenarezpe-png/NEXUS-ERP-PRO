@@ -1,4 +1,4 @@
-name: Build Nexus ERP Pro (Android & Windows)
+name: Build Nexus ERP Pro
 
 on:
   push:
@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  build-apps:
+  build-windows:
     runs-on: ubuntu-latest
 
     steps:
@@ -18,32 +18,14 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Inicializar entorno ligero y crear ejecutable Windows
-        env:
-          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
-        run: |
-          mkdir -p dist
-          # Si no existe package.json, lo inicializamos rápido
-          if [ ! -f package.json ]; then
-            npm init -y
-          fi
-          npm install electron electron-builder --save-dev
-          npx electron-builder --win nsis --x64 || true
+      - name: Instalar dependencias
+        run: npm install
 
-      - name: Generar APK Android
-        env:
-          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
-        run: |
-          npm install -g @bubblewrap/cli
-          # Inicia empaquetado de web a APK
-          echo "Generando APK..."
+      - name: Compilar Instalador de Windows (.exe)
+        run: npm run dist
 
-      - name: Subir artefactos compilados
+      - name: Subir Instalador Windows
         uses: actions/upload-artifact@v4
         with:
-          name: nexus-erp-dist
-          path: |
-            dist/*.exe
-            *.apk
+          name: Nexus-ERP-Pro-Windows-Setup
+          path: dist/*.exe
