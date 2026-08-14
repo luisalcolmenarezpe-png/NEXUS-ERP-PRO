@@ -1,4 +1,4 @@
-name: Build Nexus ERP Pro
+name: Build Nexus ERP Pro (Windows Setup)
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
 
 jobs:
   build-windows:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
 
     steps:
       - name: Checkout del código
