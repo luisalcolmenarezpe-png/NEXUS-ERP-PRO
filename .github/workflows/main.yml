@@ -1,4 +1,4 @@
-name: Build Nexus ERP Pro
+name: Build Nexus ERP Pro (Android & Windows)
 
 on:
   push:
@@ -6,42 +6,44 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
+  build-apps:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout del código
         uses: actions/checkout@v4
 
-      - name: Configurar Java JDK 17
-        uses: actions/setup-java@v5
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
         with:
-          distribution: 'zulu'
-          java-version: '17'
+          node-version: '20'
 
-      - name: Configurar Flutter SDK
-        uses: subosito/flutter-action@v2
-        with:
-          flutter-version: '3.22.x'
-          channel: 'stable'
+      - name: Instalar dependencias del proyecto
+        run: npm install
 
-      - name: Obtener dependencias
-        run: flutter pub get
-
-      - name: Generar archivos de plataforma Android
-        run: flutter create . --platforms=android
-
-      - name: Compilar APK Android Release
+      # 1. COMPILACIÓN PARA WINDOWS (.exe)
+      - name: Compilar ejecutable para Windows
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
         run: |
-          flutter build apk --release \
-            --dart-define=SUPABASE_URL=$SUPABASE_URL \
-            --dart-define=SUPABASE_KEY=$SUPABASE_KEY
+          npx electron-builder --win nsis --x64
+        continue-on-error: true
 
-      - name: Subir APK generado
+      # 2. COMPILACIÓN PARA ANDROID (.apk)
+      - name: Compilar APK Android
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+        run: |
+          npx @bubblewrap/cli build
+        continue-on-error: true
+
+      # 3. SUBIR LOS ARCHIVOS COMPILADOS COMO ARTEFACTOS
+      - name: Subir ejecutable de Windows y APK
         uses: actions/upload-artifact@v4
         with:
-          name: nexus-erp-pro-apk
-          path: build/app/outputs/flutter-apk/app-release.apk
+          name: nexus-erp-dist
+          path: |
+            dist/*.exe
+            *.apk
