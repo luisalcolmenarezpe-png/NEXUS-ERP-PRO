@@ -1,0 +1,23 @@
+{
+  "name": "nexus-erp-pro",
+  "version": "1.0.0",
+  "description": "Nexus ERP Pro",
+  "main": "main.js",
+  "scripts": {
+    "dist": "electron-builder --win nsis --x64"
+  },
+  "devDependencies": {
+    "electron": "^30.0.0",
+    "electron-builder": "^24.13.0"
+  },
+  "build": {
+    "appId": "com.nexuserp.app",
+    "productName": "Nexus ERP Pro",
+    "files": [
+      "**/*"
+    ],
+    "win": {
+      "target": "nsis"
+    }
+  }
+}
