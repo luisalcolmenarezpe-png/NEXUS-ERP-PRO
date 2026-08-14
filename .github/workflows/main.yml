@@ -1,31 +1,24 @@
-name: Build Nexus ERP Pro (Windows Setup)
-
-on:
-  push:
-    branches: [ "main" ]
-  workflow_dispatch:
-
-jobs:
-  build-windows:
-    runs-on: windows-latest
-
-    steps:
-      - name: Checkout del código
-        uses: actions/checkout@v4
-
-      - name: Configurar Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-
-      - name: Instalar dependencias
-        run: npm install
-
-      - name: Compilar Instalador de Windows (.exe)
-        run: npm run dist
-
-      - name: Subir Instalador Windows
-        uses: actions/upload-artifact@v4
-        with:
-          name: Nexus-ERP-Pro-Windows-Setup
-          path: dist/*.exe
+{
+  "name": "nexus-erp-pro",
+  "version": "1.0.0",
+  "description": "Nexus ERP Pro",
+  "main": "main.js",
+  "scripts": {
+    "dist": "electron-builder --win nsis --x64"
+  },
+  "devDependencies": {
+    "electron": "^30.0.0",
+    "electron-builder": "^24.13.0"
+  },
+  "build": {
+    "appId": "com.nexuserp.app",
+    "productName": "Nexus ERP Pro",
+    "publish": "never",
+    "files": [
+      "**/*"
+    ],
+    "win": {
+      "target": "nsis"
+    }
+  }
+}
