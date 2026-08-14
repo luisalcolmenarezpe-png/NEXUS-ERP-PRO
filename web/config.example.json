@@ -1,0 +1,4 @@
+{
+  "supabaseUrl": "https://YOUR-SUPABASE-APP.supabase.co",
+  "supabaseKey": "public-anon-key"
+}

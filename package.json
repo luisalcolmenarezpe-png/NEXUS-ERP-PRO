@@ -4,7 +4,12 @@
   "description": "Nexus ERP Pro",
   "main": "main.js",
   "scripts": {
-    "dist": "electron-builder --win nsis --x64"
+    "start": "electron .",
+    "dist": "electron-builder --win nsis --x64",
+    "cap:init": "npx @capacitor/cli@latest init com.nexuserp.app \"Nexus ERP Pro\" --web-dir=web"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.30.0"
   },
   "devDependencies": {
     "electron": "^30.0.0",
