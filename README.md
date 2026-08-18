@@ -44,6 +44,15 @@ Esto instala dependencias y genera el instalador en la carpeta `dist/`.
 El archivo `index.html` en la raíz redirige automáticamente a la app disponible en `web/index.html`.
 Si publicas el repositorio en GitHub Pages, la app queda accesible sin terminal ni backend.
 
+## Acceso demo
+
+La app incluye acceso local para pruebas rápidas:
+
+- `admin@empresa.com` / `admin123`
+- `ventas@empresa.com` / `ventas123`
+
+También puedes crear nuevas cuentas en la pantalla de login y se guardarán localmente en el navegador.
+
 ## Estructura principal
 
 - `index.html`: redirección para GitHub Pages

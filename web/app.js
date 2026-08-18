@@ -1,4 +1,5 @@
 const STORAGE_KEY = 'nexus-erp-pro-state-v2';
+const USERS_KEY = 'nexus-erp-pro-users-v1';
 
 const defaultState = {
   products: [
@@ -34,6 +35,10 @@ let currentTab = 'dashboard';
 let appState = loadState();
 let authUser = null;
 let supabaseClient = null;
+const demoUsers = [
+  { email: 'admin@empresa.com', password: 'admin123' },
+  { email: 'ventas@empresa.com', password: 'ventas123' },
+];
 
 const app = document.getElementById('app');
 const nav = document.getElementById('nav');
@@ -70,6 +75,31 @@ function loadState() {
 
 function saveState() {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(appState));
+}
+
+function getLocalUsers() {
+  try {
+    const raw = localStorage.getItem(USERS_KEY);
+    if (!raw) return [...demoUsers];
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) && parsed.length ? parsed : [...demoUsers];
+  } catch (error) {
+    console.warn('No se pudieron cargar usuarios locales:', error);
+    return [...demoUsers];
+  }
+}
+
+function saveLocalUsers(users) {
+  localStorage.setItem(USERS_KEY, JSON.stringify(users));
+}
+
+function authenticateLocalUser(email, password) {
+  const users = getLocalUsers();
+  const user = users.find((item) => item.email.toLowerCase() === email.toLowerCase() && item.password === password);
+  if (!user) {
+    throw new Error('Credenciales incorrectas. Prueba admin@empresa.com / admin123');
+  }
+  return { email: user.email };
 }
 
 function formatCurrency(value) {
@@ -621,7 +651,7 @@ async function initSupabase() {
 async function loginUser(email, password) {
   const client = await initSupabase();
   if (!client) {
-    authUser = { email };
+    authUser = authenticateLocalUser(email, password);
     showApp();
     return;
   }
@@ -636,6 +666,13 @@ async function loginUser(email, password) {
 async function createUser(email, password) {
   const client = await initSupabase();
   if (!client) {
+    const users = getLocalUsers();
+    const exists = users.some((user) => user.email.toLowerCase() === email.toLowerCase());
+    if (exists) {
+      throw new Error('Este usuario ya existe. Intenta iniciar sesión.');
+    }
+    users.push({ email, password });
+    saveLocalUsers(users);
     authUser = { email };
     showApp();
     return;
