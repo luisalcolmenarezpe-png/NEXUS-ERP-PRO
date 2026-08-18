@@ -56,6 +56,15 @@ function clone(data) {
   return JSON.parse(JSON.stringify(data));
 }
 
+function safeText(value) {
+  return String(value ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
 function loadState() {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
@@ -261,9 +270,9 @@ function renderDashboard() {
             <tbody>
               ${appState.sales.slice(0, 5).map((sale) => `
                 <tr>
-                  <td>${sale.customer}</td>
+                  <td>${safeText(sale.customer)}</td>
                   <td>${formatCurrency(sale.total)}</td>
-                  <td><span class="badge ${sale.status === 'Pagado' ? 'success' : 'warning'}">${sale.status}</span></td>
+                  <td><span class="badge ${sale.status === 'Pagado' ? 'success' : 'warning'}">${safeText(sale.status)}</span></td>
                 </tr>
               `).join('')}
             </tbody>
@@ -289,7 +298,7 @@ function renderPos() {
     ? appState.cart.map((item) => `
       <div class="cart-row">
         <div>
-          <strong>${item.name}</strong><br>
+          <strong>${safeText(item.name)}</strong><br>
           <small>${formatCurrency(item.price)} c/u</small>
         </div>
         <div style="display:flex;align-items:center;gap:8px;">
@@ -311,7 +320,7 @@ function renderPos() {
             <tbody>
               ${appState.products.map((product) => `
                 <tr>
-                  <td>${product.name}</td>
+                  <td>${safeText(product.name)}</td>
                   <td>${product.stock}</td>
                   <td>${formatCurrency(product.price)}</td>
                   <td><button class="primary-btn" data-add-product="${product.id}">Agregar</button></td>
@@ -413,8 +422,8 @@ function renderInventory() {
             <tbody>
               ${appState.products.map((product) => `
                 <tr>
-                  <td>${product.name}</td>
-                  <td>${product.category}</td>
+                  <td>${safeText(product.name)}</td>
+                  <td>${safeText(product.category)}</td>
                   <td>${formatCurrency(product.price)}</td>
                   <td>${product.stock}</td>
                   <td><span class="badge ${product.stock < 10 ? 'warning' : 'success'}">${product.stock < 10 ? 'Bajo' : 'OK'}</span></td>
@@ -479,10 +488,10 @@ function renderCustomers() {
             <tbody>
               ${appState.customers.map((customer) => `
                 <tr>
-                  <td>${customer.name}</td>
-                  <td>${customer.email || '-'}</td>
-                  <td>${customer.phone || '-'}</td>
-                  <td>${customer.segment || '-'}</td>
+                  <td>${safeText(customer.name)}</td>
+                  <td>${safeText(customer.email || '-')}</td>
+                  <td>${safeText(customer.phone || '-')}</td>
+                  <td>${safeText(customer.segment || '-')}</td>
                   <td>
                     <div style="display:flex;gap:8px;">
                       <button class="secondary-btn" data-edit-customer="${customer.id}">Editar</button>
@@ -533,9 +542,9 @@ function renderSales() {
             ${appState.sales.map((sale) => `
               <tr>
                 <td>${sale.id}</td>
-                <td>${sale.customer}</td>
+                <td>${safeText(sale.customer)}</td>
                 <td>${formatCurrency(sale.total)}</td>
-                <td><span class="badge ${sale.status === 'Pagado' ? 'success' : 'warning'}">${sale.status}</span></td>
+                <td><span class="badge ${sale.status === 'Pagado' ? 'success' : 'warning'}">${safeText(sale.status)}</span></td>
               </tr>
             `).join('')}
           </tbody>
