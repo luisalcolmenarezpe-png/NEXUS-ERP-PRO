@@ -1,30 +1,38 @@
 const { app, BrowserWindow } = require('electron');
 const path = require('path');
 
-function createWindow () {
+function createWindow() {
   const win = new BrowserWindow({
-    width: 1280,
-    height: 800,
-    title: "Nexus ERP Pro",
+    width: 1366,
+    height: 900,
+    minWidth: 1100,
+    minHeight: 700,
+    title: 'Nexus ERP Pro',
+    backgroundColor: '#0f172a',
+    autoHideMenuBar: true,
     webPreferences: {
-      // Seguridad: no activar nodeIntegration en renderer salvo que sea necesario.
+      preload: path.join(__dirname, 'preload.js'),
+      contextIsolation: true,
       nodeIntegration: false,
-      contextIsolation: true
-      // Si necesitas APIs Node en renderer, usaremos preload.js para exponerlas.
-    }
+      sandbox: false,
+    },
   });
 
-  // Cargar el index.html desde la carpeta web/
   win.loadFile(path.join(__dirname, 'web', 'index.html'));
 }
 
-app.whenReady().then(createWindow);
+app.whenReady().then(() => {
+  createWindow();
 
-// macOS behavior
-app.on('activate', () => {
-  if (BrowserWindow.getAllWindows().length === 0) createWindow();
+  app.on('activate', () => {
+    if (BrowserWindow.getAllWindows().length === 0) {
+      createWindow();
+    }
+  });
 });
 
 app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin') app.quit();
+  if (process.platform !== 'darwin') {
+    app.quit();
+  }
 });
