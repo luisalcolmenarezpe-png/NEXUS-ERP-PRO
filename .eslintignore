@@ -1,0 +1,4 @@
+node_modules/
+dist/
+web/*.html
+web/manifest.json

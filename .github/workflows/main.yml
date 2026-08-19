@@ -1,24 +1,43 @@
+name: Deploy Nexus ERP Pro to GitHub Pages
 
-  "name": "nexus-erp-pro",
-  "version": "1.0.0",
-  "description": "Nexus ERP Pro",
-  "main": "main.js",
-  "scripts": {
-    "dist": "electron-builder --win nsis --x64"
-  },
-  "devDependencies": {
-    "electron": "^30.0.0",
-    "electron-builder": "^24.13.0"
-  },
-  "build": {
-    "appId": "com.nexuserp.app",
-    "productName": "Nexus ERP Pro",
-    "publish": "never",
-    "files": [
-      "**/*"
-    ],
-    "win": {
-      "target": "nsis"
-    }
-  }
-}
+on:
+  push:
+    branches:
+      - main
+      - luisalcolmenarezpe-png-web-erp-app
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload static site
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: .
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

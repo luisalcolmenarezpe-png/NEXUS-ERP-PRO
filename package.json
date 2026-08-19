@@ -8,7 +8,8 @@
     "start": "electron .",
     "dev": "electron .",
     "build": "electron-builder --dir",
-    "dist:win": "electron-builder --win nsis --x64"
+    "dist:win": "electron-builder --win nsis --x64",
+    "dist:win:secure": "node scripts/build-win-secure.js"
   },
   "build": {
     "appId": "com.nexuserp.app",
@@ -25,6 +26,8 @@
       "output": "dist"
     },
     "win": {
+      "signAndEditExecutable": true,
+      "requestedExecutionLevel": "asInvoker",
       "target": [
         {
           "target": "nsis",
@@ -35,8 +38,12 @@
     "nsis": {
       "oneClick": false,
       "allowToChangeInstallationDirectory": true,
-      "shortcutName": "Nexus ERP Pro"
+      "shortcutName": "Nexus ERP Pro",
+      "artifactName": "NexusERPPro-${version}-setup.exe"
     }
+  },
+  "dependencies": {
+    "keytar": "^8.0.0"
   },
   "devDependencies": {
     "electron": "^30.0.0",

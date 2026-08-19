@@ -1,4 +1,5 @@
 const STORAGE_KEY = 'nexus-erp-pro-state-v2';
+const USERS_KEY = 'nexus-erp-pro-users-v1';
 
 const defaultState = {
   products: [
@@ -34,6 +35,10 @@ let currentTab = 'dashboard';
 let appState = loadState();
 let authUser = null;
 let supabaseClient = null;
+const demoUsers = [
+  { email: 'admin@empresa.com', password: 'admin123' },
+  { email: 'ventas@empresa.com', password: 'ventas123' },
+];
 
 const app = document.getElementById('app');
 const nav = document.getElementById('nav');
@@ -49,6 +54,15 @@ const btnExportCsv = document.getElementById('btnExportCsv');
 
 function clone(data) {
   return JSON.parse(JSON.stringify(data));
+}
+
+function safeText(value) {
+  return String(value ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
 }
 
 function loadState() {
@@ -70,6 +84,56 @@ function loadState() {
 
 function saveState() {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(appState));
+}
+
+function getLocalUsers() {
+  try {
+    const raw = localStorage.getItem(USERS_KEY);
+    if (!raw) return [...demoUsers];
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) && parsed.length ? parsed : [...demoUsers];
+  } catch (error) {
+    console.warn('No se pudieron cargar usuarios locales:', error);
+    return [...demoUsers];
+  }
+}
+
+async function hashPassword(password) {
+  const data = new TextEncoder().encode(password);
+  const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+  return Array.from(new Uint8Array(hashBuffer))
+    .map((b) => b.toString(16).padStart(2, '0'))
+    .join('');
+}
+
+async function saveLocalUsers(users) {
+  const sanitizedUsers = await Promise.all(
+    users.map(async (user) => {
+      if (user.passwordHash) {
+        return { email: user.email, passwordHash: user.passwordHash };
+      }
+      if (user.password) {
+        const passwordHash = await hashPassword(user.password);
+        return { email: user.email, passwordHash };
+      }
+      return { email: user.email };
+    }),
+  );
+  localStorage.setItem(USERS_KEY, JSON.stringify(sanitizedUsers));
+}
+
+async function authenticateLocalUser(email, password) {
+  const users = getLocalUsers();
+  const passwordHash = await hashPassword(password);
+  const user = users.find(
+    (item) =>
+      item.email.toLowerCase() === email.toLowerCase()
+      && (item.passwordHash === passwordHash || item.password === password),
+  );
+  if (!user) {
+    throw new Error('Credenciales incorrectas. Prueba admin@empresa.com / admin123');
+  }
+  return { email: user.email };
 }
 
 function formatCurrency(value) {
@@ -231,9 +295,9 @@ function renderDashboard() {
             <tbody>
               ${appState.sales.slice(0, 5).map((sale) => `
                 <tr>
-                  <td>${sale.customer}</td>
+                  <td>${safeText(sale.customer)}</td>
                   <td>${formatCurrency(sale.total)}</td>
-                  <td><span class="badge ${sale.status === 'Pagado' ? 'success' : 'warning'}">${sale.status}</span></td>
+                  <td><span class="badge ${sale.status === 'Pagado' ? 'success' : 'warning'}">${safeText(sale.status)}</span></td>
                 </tr>
               `).join('')}
             </tbody>
@@ -259,7 +323,7 @@ function renderPos() {
     ? appState.cart.map((item) => `
       <div class="cart-row">
         <div>
-          <strong>${item.name}</strong><br>
+          <strong>${safeText(item.name)}</strong><br>
           <small>${formatCurrency(item.price)} c/u</small>
         </div>
         <div style="display:flex;align-items:center;gap:8px;">
@@ -281,7 +345,7 @@ function renderPos() {
             <tbody>
               ${appState.products.map((product) => `
                 <tr>
-                  <td>${product.name}</td>
+                  <td>${safeText(product.name)}</td>
                   <td>${product.stock}</td>
                   <td>${formatCurrency(product.price)}</td>
                   <td><button class="primary-btn" data-add-product="${product.id}">Agregar</button></td>
@@ -383,8 +447,8 @@ function renderInventory() {
             <tbody>
               ${appState.products.map((product) => `
                 <tr>
-                  <td>${product.name}</td>
-                  <td>${product.category}</td>
+                  <td>${safeText(product.name)}</td>
+                  <td>${safeText(product.category)}</td>
                   <td>${formatCurrency(product.price)}</td>
                   <td>${product.stock}</td>
                   <td><span class="badge ${product.stock < 10 ? 'warning' : 'success'}">${product.stock < 10 ? 'Bajo' : 'OK'}</span></td>
@@ -449,10 +513,10 @@ function renderCustomers() {
             <tbody>
               ${appState.customers.map((customer) => `
                 <tr>
-                  <td>${customer.name}</td>
-                  <td>${customer.email || '-'}</td>
-                  <td>${customer.phone || '-'}</td>
-                  <td>${customer.segment || '-'}</td>
+                  <td>${safeText(customer.name)}</td>
+                  <td>${safeText(customer.email || '-')}</td>
+                  <td>${safeText(customer.phone || '-')}</td>
+                  <td>${safeText(customer.segment || '-')}</td>
                   <td>
                     <div style="display:flex;gap:8px;">
                       <button class="secondary-btn" data-edit-customer="${customer.id}">Editar</button>
@@ -503,9 +567,9 @@ function renderSales() {
             ${appState.sales.map((sale) => `
               <tr>
                 <td>${sale.id}</td>
-                <td>${sale.customer}</td>
+                <td>${safeText(sale.customer)}</td>
                 <td>${formatCurrency(sale.total)}</td>
-                <td><span class="badge ${sale.status === 'Pagado' ? 'success' : 'warning'}">${sale.status}</span></td>
+                <td><span class="badge ${sale.status === 'Pagado' ? 'success' : 'warning'}">${safeText(sale.status)}</span></td>
               </tr>
             `).join('')}
           </tbody>
@@ -621,7 +685,7 @@ async function initSupabase() {
 async function loginUser(email, password) {
   const client = await initSupabase();
   if (!client) {
-    authUser = { email };
+    authUser = authenticateLocalUser(email, password);
     showApp();
     return;
   }
@@ -636,6 +700,14 @@ async function loginUser(email, password) {
 async function createUser(email, password) {
   const client = await initSupabase();
   if (!client) {
+    const users = getLocalUsers();
+    const exists = users.some((user) => user.email.toLowerCase() === email.toLowerCase());
+    if (exists) {
+      throw new Error('Este usuario ya existe. Intenta iniciar sesión.');
+    }
+    const passwordHash = await hashPassword(password);
+    users.push({ email, passwordHash });
+    await saveLocalUsers(users);
     authUser = { email };
     showApp();
     return;
