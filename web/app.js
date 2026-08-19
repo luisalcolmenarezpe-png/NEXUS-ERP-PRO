@@ -98,13 +98,38 @@ function getLocalUsers() {
   }
 }
 
-function saveLocalUsers(users) {
-  localStorage.setItem(USERS_KEY, JSON.stringify(users));
+async function hashPassword(password) {
+  const data = new TextEncoder().encode(password);
+  const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+  return Array.from(new Uint8Array(hashBuffer))
+    .map((b) => b.toString(16).padStart(2, '0'))
+    .join('');
 }
 
-function authenticateLocalUser(email, password) {
+async function saveLocalUsers(users) {
+  const sanitizedUsers = await Promise.all(
+    users.map(async (user) => {
+      if (user.passwordHash) {
+        return { email: user.email, passwordHash: user.passwordHash };
+      }
+      if (user.password) {
+        const passwordHash = await hashPassword(user.password);
+        return { email: user.email, passwordHash };
+      }
+      return { email: user.email };
+    }),
+  );
+  localStorage.setItem(USERS_KEY, JSON.stringify(sanitizedUsers));
+}
+
+async function authenticateLocalUser(email, password) {
   const users = getLocalUsers();
-  const user = users.find((item) => item.email.toLowerCase() === email.toLowerCase() && item.password === password);
+  const passwordHash = await hashPassword(password);
+  const user = users.find(
+    (item) =>
+      item.email.toLowerCase() === email.toLowerCase()
+      && (item.passwordHash === passwordHash || item.password === password),
+  );
   if (!user) {
     throw new Error('Credenciales incorrectas. Prueba admin@empresa.com / admin123');
   }
@@ -680,8 +705,9 @@ async function createUser(email, password) {
     if (exists) {
       throw new Error('Este usuario ya existe. Intenta iniciar sesión.');
     }
-    users.push({ email, password });
-    saveLocalUsers(users);
+    const passwordHash = await hashPassword(password);
+    users.push({ email, passwordHash });
+    await saveLocalUsers(users);
     authUser = { email };
     showApp();
     return;
