@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Nexus ERP Pro - Versión de Prueba</title>
+    <meta name="description" content="Versión de prueba local - Nexus ERP Pro" />
+    <link rel="stylesheet" href="styles.css" />
+    <style>
+      .notice{max-width:900px;margin:20px auto;padding:12px;background:#fff7cc;border:1px solid #ffd36b;border-radius:6px}
+      .actions{max-width:900px;margin:10px auto;display:flex;gap:8px}
+      .actions a{padding:10px 14px;background:#0b5cff;color:#fff;border-radius:6px;text-decoration:none}
+    </style>
+  </head>
+  <body>
+    <div class="notice">
+      <h2>Versión de prueba - Nexus ERP Pro</h2>
+      <p>Abre esta página localmente para probar la app sin servidor. Recomendado: abre <strong>web/index.html</strong> directamente (doble clic) o usa este botón para abrir la app principal.</p>
+      <ul>
+        <li>Credenciales demo: <code>admin@empresa.com / admin123</code></li>
+        <li>Funciona sin Supabase; la sincronización es opcional y requiere configurar <code>web/config.json</code></li>
+      </ul>
+    </div>
+
+    <div class="actions">
+      <a href="./index.html" target="_self">Abrir app principal (recomendado)</a>
+      <a href="./app.js" target="_blank">Ver app.js</a>
+      <a href="./config.json" target="_blank">Ver config.json (placeholder)</a>
+    </div>
+
+    <p style="max-width:900px;margin:16px auto;color:#666">Si el navegador bloquea la importación de módulos desde file://, usa un servidor local (ej. Python: <code>python -m http.server 8000</code>) o publica en GitHub Pages.</p>
+  </body>
+</html>
