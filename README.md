@@ -92,3 +92,27 @@ La app de escritorio usa Keytar (sistema keychain) para guardar tokens de forma 
 - Proporciona el certificado .pfx sólo en el entorno seguro de GitHub Secrets.
 - Habilita Dependabot y ejecuta `npm audit` regularmente.
 - Añade pruebas E2E y escaneo SCA antes de habilitar despliegues automáticos.
+
+## Seguridad: Snyk y GitHub Advanced Security (CodeQL)
+
+Se agregaron workflows para escaneo automático:
+
+- CodeQL: realiza análisis estático para detectar vulnerabilidades de seguridad y problemas de calidad.
+  - Archivo: .github/workflows/codeql-analysis.yml
+  - Para usar CodeQL no se necesitan secretos; habilítalo en Security → Code scanning en GitHub si quieres ver alertas en PRs.
+
+- Snyk: escanea dependencias y envía un "monitor" a tu cuenta SnyK.
+  - Archivo: .github/workflows/snyk-scan.yml
+  - Requiere la variable de entorno secreta `SNYK_TOKEN` en GitHub Secrets (crear una cuenta en https://snyk.io y generar token)
+
+Cómo habilitar Snyk:
+1. Regístrate en https://snyk.io y obtén tu API token.
+2. En GitHub: Settings → Secrets and variables → Actions → New repository secret.
+   - Name: SNYK_TOKEN
+   - Value: tu token Snyk
+3. Los workflows correrán en cada push y pull request.
+
+Cómo revisar CodeQL:
+1. En GitHub repo: Security → Code scanning alerts para ver resultados.
+
+Estas herramientas junto con Dependabot fortalecen el escaneo SCA y el análisis estático.
