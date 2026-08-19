@@ -1,28 +1,45 @@
 {
   "name": "nexus-erp-pro",
   "version": "1.0.0",
-  "description": "Nexus ERP Pro",
+  "description": "Nexus ERP Pro - ERP/POS ligero basado en Electron + HTML/JS",
+  "private": true,
   "main": "main.js",
   "scripts": {
     "start": "electron .",
-    "dist": "electron-builder --win nsis --x64",
-    "cap:init": "npx @capacitor/cli@latest init com.nexuserp.app \"Nexus ERP Pro\" --web-dir=web"
-  },
-  "dependencies": {
-    "@supabase/supabase-js": "^2.30.0"
-  },
-  "devDependencies": {
-    "electron": "^30.0.0",
-    "electron-builder": "^24.13.0"
+    "dev": "electron .",
+    "build": "electron-builder --dir",
+    "dist:win": "electron-builder --win nsis --x64"
   },
   "build": {
     "appId": "com.nexuserp.app",
     "productName": "Nexus ERP Pro",
+    "copyright": "Copyright © 2026 Nexus ERP Pro",
+    "asar": true,
     "files": [
-      "**/*"
+      "main.js",
+      "preload.js",
+      "web/**/*",
+      "package.json"
     ],
+    "directories": {
+      "output": "dist"
+    },
     "win": {
-      "target": "nsis"
+      "target": [
+        {
+          "target": "nsis",
+          "arch": ["x64"]
+        }
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "shortcutName": "Nexus ERP Pro"
     }
+  },
+  "devDependencies": {
+    "electron": "^30.0.0",
+    "electron-builder": "^24.13.0"
   }
 }
