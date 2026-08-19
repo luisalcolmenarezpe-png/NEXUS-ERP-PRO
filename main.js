@@ -1,5 +1,6 @@
-const { app, BrowserWindow, session } = require('electron');
+const { app, BrowserWindow, session, ipcMain } = require('electron');
 const path = require('path');
+const keytar = require('keytar');
 
 const allowedSupabaseHosts = ['*.supabase.co'];
 const allowedJsdelivrHosts = ['cdn.jsdelivr.net'];
@@ -91,6 +92,36 @@ app.on('web-contents-created', (event, contents) => {
       newWindowEvent.preventDefault();
     }
   });
+});
+
+// Secure IPC handlers for credential storage using system keychain
+ipcMain.handle('secure-store-get', async (event, service, account) => {
+  try {
+    const val = await keytar.getPassword(service, account);
+    return val || null;
+  } catch (err) {
+    console.warn('secure-store-get error:', err);
+    return null;
+  }
+});
+
+ipcMain.handle('secure-store-set', async (event, service, account, password) => {
+  try {
+    await keytar.setPassword(service, account, password);
+    return true;
+  } catch (err) {
+    console.warn('secure-store-set error:', err);
+    return false;
+  }
+});
+
+ipcMain.handle('secure-store-delete', async (event, service, account) => {
+  try {
+    return await keytar.deletePassword(service, account);
+  } catch (err) {
+    console.warn('secure-store-delete error:', err);
+    return false;
+  }
 });
 
 app.whenReady().then(() => {

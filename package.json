@@ -42,6 +42,9 @@
       "artifactName": "NexusERPPro-${version}-setup.exe"
     }
   },
+  "dependencies": {
+    "keytar": "^8.0.0"
+  },
   "devDependencies": {
     "electron": "^30.0.0",
     "electron-builder": "^24.13.0"
