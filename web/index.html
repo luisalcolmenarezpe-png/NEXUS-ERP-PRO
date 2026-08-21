@@ -13,24 +13,6 @@
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
-   <!-- PANTALLA DE LOGIN DEFINITIVA -->
-<div id="pantalla-login" style="display: flex; justify-content: center; align-items: center; height: 100vh; background-color: #0f172a;">
-    <div style="background: #1e293b; padding: 40px; border-radius: 12px; text-align: center; width: 300px; box-shadow: 0 10px 25px rgba(0,0,0,0.5);">
-        <h2 style="color: #38bdf8;">Nexus ERP Pro</h2>
-        <p style="color: #94a3b8; margin-bottom: 20px;">Acceso Restringido</p>
-        
-        <input type="text" id="input-usuario" placeholder="Usuario" style="width: 100%; padding: 12px; margin-bottom: 15px; background: #0f172a; color: white; border: 1px solid #334155; border-radius: 6px;">
-        
-        <input type="password" id="input-password" placeholder="Contraseña" style="width: 100%; padding: 12px; margin-bottom: 20px; background: #0f172a; color: white; border: 1px solid #334155; border-radius: 6px;">
-        
-        <button onclick="verificarAcceso()" style="width: 100%; padding: 12px; background: #38bdf8; color: #0f172a; font-weight: bold; border: none; border-radius: 6px; cursor: pointer;">Entrar al Sistema</button>
-        
-        <p id="error-login" style="color: #fca5a5; display: none; margin-top: 15px;">Credenciales incorrectas</p>
-    </div>
-</div>
-
-<!-- INICIO DEL SISTEMA (Se mantiene oculto hasta poner la clave) -->
-<div id="sistema-principal" style="display: none;">
     <div id="authScreen" class="auth-screen">
       <div class="auth-card">
         <h2>Nexus ERP Pro</h2>
@@ -83,45 +65,3 @@
     </div>
 </div> <!-- Cierra la caja fuerte -->
 
-<!-- MOTOR DE SEGURIDAD -->
-<script>
-    function verificarAcceso() {
-        const usuario = document.getElementById('input-usuario').value.toLowerCase();
-        const password = document.getElementById('input-password').value;
-
-        document.getElementById('error-login').style.display = 'none';
-
-        if (password !== "1234") {
-            document.getElementById('error-login').style.display = 'block';
-            return;
-        }
-
-        if (usuario === 'admin') {
-            document.getElementById('pantalla-login').style.display = 'none';
-            document.getElementById('sistema-principal').style.display = 'block'; 
-        } 
-        else if (usuario === 'cajero') {
-            document.getElementById('pantalla-login').style.display = 'none';
-            document.getElementById('sistema-principal').style.display = 'block';
-            
-            // Ocultar menús para el cajero
-            const menuDashboard = document.getElementById('menu-dashboard');
-            const menuInventario = document.getElementById('menu-inventario');
-            const menuFinanzas = document.getElementById('menu-finanzas');
-            const menuClientes = document.getElementById('menu-clientes');
-            const menuVentas = document.getElementById('menu-ventas');
-            
-            if(menuDashboard) menuDashboard.style.display = 'none';
-            if(menuInventario) menuInventario.style.display = 'none';
-            if(menuFinanzas) menuFinanzas.style.display = 'none';
-            if(menuClientes) menuClientes.style.display = 'none';
-            if(menuVentas) menuVentas.style.display = 'none';
-        } 
-        else {
-            document.getElementById('error-login').style.display = 'block';
-        }
-    }
-</script>
-    <script type="module" src="./app.js"></script>
-  </body>
-</html>
