@@ -1,55 +1,44 @@
 document.addEventListener("DOMContentLoaded", function() {
-    const btn = document.getElementById('btn-entrar-sistema');
-    const passInput = document.getElementById('p-login');
-
-    // Función de Login
-    function ejecutarLogin() {
-        const uInput = document.getElementById('u-login');
-        const pInput = document.getElementById('p-login');
-        const pantallaLogin = document.getElementById('pantalla-login');
-        const sistemaContenido = document.getElementById('sistema-contenido');
-        const errorP = document.getElementById('error-login');
-        
-        if (!uInput || !pInput) return;
-
-        const u = uInput.value.toLowerCase().trim();
-        const p = pInput.value.trim();
+    
+    // Función Login mejorada con roles
+    document.getElementById('btn-entrar-sistema').addEventListener('click', function() {
+        const u = document.getElementById('u-login').value.toLowerCase().trim();
+        const p = document.getElementById('p-login').value.trim();
         
         if (p === "1234" && (u === "admin" || u === "cajero")) {
-            if (pantallaLogin) pantallaLogin.style.display = 'none';
-            if (sistemaContenido) sistemaContenido.style.display = 'block';
+            document.getElementById('pantalla-login').style.display = 'none';
+            document.getElementById('sistema-contenido').style.display = 'block';
             
+            // Lógica de visibilidad de menús
             if (u === "cajero") {
-                ['menu-inventario', 'menu-finanzas', 'menu-clientes'].forEach(id => {
-                    const el = document.getElementById(id);
-                    if (el) el.style.display = 'none';
-                });
+                // El cajero solo ve Caja y Cierre
+                document.getElementById('menu-inventario').style.display = 'none';
+                document.getElementById('menu-finanzas').style.display = 'none';
+                document.getElementById('menu-clientes').style.display = 'none';
+                document.getElementById('pageTitle').innerText = "CAJA / POS";
+            } else {
+                // El admin ve todo
+                document.getElementById('menu-inventario').style.display = 'block';
+                document.getElementById('menu-finanzas').style.display = 'block';
+                document.getElementById('menu-clientes').style.display = 'block';
+                document.getElementById('pageTitle').innerText = "DASHBOARD ADMIN";
             }
         } else {
-            if (errorP) errorP.style.display = 'block';
+            alert("Usuario o contraseña incorrectos");
         }
-    }
-
-    // Lógica de Navegación (Aquí está lo que faltaba)
-    function navegar(seccion) {
-        const appView = document.getElementById('app');
-        const pageTitle = document.getElementById('pageTitle');
-        if (!appView) return;
-
-        pageTitle.innerText = seccion.charAt(0).toUpperCase() + seccion.slice(1);
-        appView.innerHTML = `<h3>Sección: ${seccion}</h3><p>Cargando módulo de ${seccion}...</p>`;
-    }
-
-    // Eventos de botones
-    if (btn) btn.addEventListener('click', ejecutarLogin);
-    if (passInput) passInput.addEventListener('keypress', function(e) { if (e.key === 'Enter') ejecutarLogin(); });
-
-    // Eventos de menú
-    ['menu-inicio', 'menu-inventario', 'menu-finanzas', 'menu-clientes'].forEach(id => {
-        const el = document.getElementById(id);
-        if (el) el.addEventListener('click', (e) => {
-            e.preventDefault();
-            navegar(id.replace('menu-', ''));
-        });
     });
+
+    // Delegación de eventos para navegación
+    document.querySelector('.nav').addEventListener('click', function(e) {
+        const target = e.target.closest('li');
+        if (!target) return;
+        
+        e.preventDefault();
+        const seccion = target.id.replace('menu-', '');
+        document.getElementById('pageTitle').innerText = seccion.toUpperCase();
+        document.getElementById('app').innerHTML = `<h3>Módulo: ${seccion.toUpperCase()}</h3><p>Contenido del módulo ${seccion} en desarrollo...</p>`;
+    });
+
+    // Cerrar sesión
+    document.getElementById('btnLogout').addEventListener('click', () => location.reload());
 });
