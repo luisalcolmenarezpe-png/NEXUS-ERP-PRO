@@ -1,5 +1,4 @@
-// --- ESTADO GLOBAL Y PERSISTENCIA ---
-const STORAGE_KEY = 'nexus-erp-pro-enterprise-v1';
+const STORAGE_KEY = 'nexus-erp-pro-enterprise-v2';
 
 const defaultState = {
   products: [
@@ -62,7 +61,6 @@ function formatCurrency(value) {
   return 'USD ' + num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 
-// --- INICIALIZACIÓN ---
 document.addEventListener("DOMContentLoaded", function() {
     setInterval(() => {
         const reloj = document.getElementById('reloj-sistema');
@@ -115,7 +113,6 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 });
 
-// --- RENDERIZADOR CORPORATIVO ---
 function renderNav() {
     const nav = document.getElementById('nav');
     if (!nav) return;
@@ -156,7 +153,6 @@ function renderApp() {
     else if (currentTab === 'config') renderConfig();
 }
 
-// 1. MÓDULO POS / VENTAS
 function renderPos() {
     const pageTitle = document.getElementById('pageTitle');
     const app = document.getElementById('app');
@@ -186,7 +182,6 @@ function renderPos() {
 
     app.innerHTML = `
       <div style="display: grid; grid-template-columns: 1fr 380px; gap: 20px; height: 100%;">
-        <!-- LISTA DE PRODUCTOS (PLU) -->
         <div style="background: #1e293b; padding: 20px; border-radius: 10px; border: 1px solid #334155; display:flex; flex-direction:column;">
           <h3 style="margin-top:0; color:#38bdf8; font-size:16px; margin-bottom:15px;">Catálogo de Productos y PLU</h3>
           <div style="flex:1; overflow-y: auto;">
@@ -201,14 +196,14 @@ function renderPos() {
                 </tr>
               </thead>
               <tbody>
-                ${appState.products.map(p => `
+                ${appState.products.map(product => `
                   <tr style="border-bottom: 1px solid #334155;">
-                    <td style="padding: 12px 10px; font-weight:500;">${safeText(p.name)}</td>
-                    <td style="padding: 12px 10px; color:#94a3b8; font-size:13px;">${safeText(p.category)}</td>
-                    <td style="padding: 12px 10px;">${p.stock}</td>
-                    <td style="padding: 12px 10px; color:#4ade80; font-weight:600;">${formatCurrency(p.price)}</td>
+                    <td style="padding: 12px 10px; font-weight:500;">${safeText(product.name)}</td>
+                    <td style="padding: 12px 10px; color:#94a3b8; font-size:13px;">${safeText(product.category)}</td>
+                    <td style="padding: 12px 10px;">${product.stock}</td>
+                    <td style="padding: 12px 10px; color:#4ade80; font-weight:600;">${formatCurrency(product.price)}</td>
                     <td style="padding: 12px 10px; text-align:right;">
-                      <button data-add="${p.id}" style="padding: 6px 14px; background:#0284c7; color:#fff; border:none; border-radius:4px; font-weight:600; cursor:pointer; font-size:12px;">Agregar</button>
+                      <button data-add="${product.id}" style="padding: 6px 14px; background:#0284c7; color:#fff; border:none; border-radius:4px; font-weight:600; cursor:pointer; font-size:12px;">Agregar</button>
                     </td>
                   </tr>
                 `).join('')}
@@ -217,7 +212,6 @@ function renderPos() {
           </div>
         </div>
 
-        <!-- CARRITO Y TOTALES -->
         <div style="background: #1e293b; padding: 20px; border-radius: 10px; border: 1px solid #334155; display: flex; flex-direction: column; justify-content: space-between;">
           <div>
             <h3 style="margin-top:0; border-bottom:1px solid #334155; padding-bottom:12px; color:#38bdf8; font-size:16px;">Documento en Curso</h3>
@@ -243,11 +237,10 @@ function renderPos() {
       </div>
     `;
 
-    // Eventos POS
     app.querySelectorAll('[data-add]').forEach(btn => {
         btn.addEventListener('click', (e) => {
             const id = Number(e.currentTarget.dataset.add);
-            const prod = appState.products.find(p => p.id === id);
+            const prod = appState.products.find(item => item.id === id);
             if (!prod || prod.stock <= 0) return alert('Producto sin stock disponible.');
             const existing = appState.cart.find(item => item.id === id);
             if (existing) existing.quantity += 1;
@@ -272,7 +265,6 @@ function renderPos() {
     document.getElementById('checkoutBtn')?.addEventListener('click', () => {
         if (!appState.cart.length) return alert('El documento en curso está vacío.');
         
-        // Simulación de Pago y Facturación Fiscal Exitosa
         appState.sales.unshift({
             id: Date.now(),
             customer: 'Cliente General (Mostrador)',
@@ -281,7 +273,6 @@ function renderPos() {
             fecha: new Date().toLocaleString()
         });
 
-        // Descontar stock
         appState.cart.forEach(item => {
             const p = appState.products.find(prod => prod.id === item.id);
             if (p) p.stock = Math.max(0, p.stock - item.quantity);
@@ -299,7 +290,6 @@ function renderPos() {
     });
 }
 
-// 2. MÓDULO REPORTES FISCALES X/Z
 function renderReportes() {
     const pageTitle = document.getElementById('pageTitle');
     const app = document.getElementById('app');
@@ -327,7 +317,6 @@ function renderReportes() {
     `;
 }
 
-// 3. MÓDULO INVENTARIO Y PLU
 function renderInventory() {
     const pageTitle = document.getElementById('pageTitle');
     const app = document.getElementById('app');
@@ -370,15 +359,15 @@ function renderInventory() {
                 </tr>
               </thead>
               <tbody>
-                ${appState.products.map(p => `
+                ${appState.products.map(product => `
                   <tr style="border-bottom: 1px solid #334155;">
-                    <td style="padding: 10px; color:#94a3b8;">${p.id}</td>
-                    <td style="padding: 10px; font-weight:500;">${safeText(p.name)}</td>
-                    <td style="padding: 10px; color:#94a3b8;">${safeText(p.category)}</td>
-                    <td style="padding: 10px; color:#4ade80;">${formatCurrency(p.price)}</td>
-                    <td style="padding: 10px;">${p.stock}</td>
+                    <td style="padding: 10px; color:#94a3b8;">${product.id}</td>
+                    <td style="padding: 10px; font-weight:500;">${safeText(product.name)}</td>
+                    <td style="padding: 10px; color:#94a3b8;">${safeText(product.category)}</td>
+                    <td style="padding: 10px; color:#4ade80;">${formatCurrency(product.price)}</td>
+                    <td style="padding: 10px;">${product.stock}</td>
                     <td style="padding: 10px; text-align:right;">
-                      <button data-delete-prod="${p.id}" style="padding: 5px 10px; background:#dc2626; color:#fff; border:none; border-radius:4px; cursor:pointer; font-size:11px;">Eliminar</button>
+                      <button data-delete-prod="${product.id}" style="padding: 5px 10px; background:#dc2626; color:#fff; border:none; border-radius:4px; cursor:pointer; font-size:11px;">Eliminar</button>
                     </td>
                   </tr>
                 `).join('')}
@@ -393,3 +382,11 @@ function renderInventory() {
         e.preventDefault();
         const form = e.currentTarget;
         const newProd = {
+            id: Date.now(),
+            name: form.name.value.trim(),
+            category: form.category.value.trim(),
+            price: Number(form.price.value),
+            stock: Number(form.stock.value)
+        };
+        appState.products.push(newProd);
+        saveState();
