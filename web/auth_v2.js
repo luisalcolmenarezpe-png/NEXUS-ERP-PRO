@@ -5,6 +5,8 @@ document.addEventListener("DOMContentLoaded", function() {
     function ejecutarLogin() {
         const uInput = document.getElementById('u-login');
         const pInput = document.getElementById('p-login');
+        const pantallaLogin = document.getElementById('pantalla-login');
+        const sistemaContenido = document.getElementById('sistema-contenido');
         const errorP = document.getElementById('error-login');
         
         if (!uInput || !pInput) return;
@@ -15,9 +17,6 @@ document.addEventListener("DOMContentLoaded", function() {
         if (errorP) errorP.style.display = 'none';
 
         if (p === "1234" && (u === "admin" || u === "cajero")) {
-            const pantallaLogin = document.getElementById('pantalla-login');
-            const sistemaContenido = document.getElementById('sistema-contenido');
-            
             if (pantallaLogin) pantallaLogin.style.display = 'none';
             if (sistemaContenido) sistemaContenido.style.display = 'block';
             
@@ -33,15 +32,10 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     }
 
-    if (btn) {
-        btn.addEventListener('click', ejecutarLogin);
-    }
-
+    if (btn) btn.addEventListener('click', ejecutarLogin);
     if (passInput) {
         passInput.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                ejecutarLogin();
-            }
+            if (e.key === 'Enter') ejecutarLogin();
         });
     }
 });
