@@ -1,4 +1,5 @@
-const STORAGE_KEY = 'nexus-erp-pro-enterprise-v2';
+// --- ESTADO GLOBAL Y PERSISTENCIA PROFESIONAL ---
+const STORAGE_KEY = 'nexus-erp-pro-enterprise-final';
 
 const defaultState = {
   products: [
@@ -61,6 +62,7 @@ function formatCurrency(value) {
   return 'USD ' + num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 
+// --- CONTROL DE ACCESO Y ARRANQUE ---
 document.addEventListener("DOMContentLoaded", function() {
     setInterval(() => {
         const reloj = document.getElementById('reloj-sistema');
@@ -100,7 +102,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
                 renderApp();
             } else {
-                if (errorP) errorP.style.display = 'block';
+                if (errorP) errorP.classList.remove('hidden');
             }
         });
     }
@@ -111,8 +113,14 @@ document.addEventListener("DOMContentLoaded", function() {
             if (e.key === 'Enter' && btnEntrar) btnEntrar.click();
         });
     }
+
+    const btnLogout = document.getElementById('btnLogout');
+    if (btnLogout) {
+        btnLogout.addEventListener('click', () => location.reload());
+    }
 });
 
+// --- RENDERIZADOR DE NAVEGACIÓN ---
 function renderNav() {
     const nav = document.getElementById('nav');
     if (!nav) return;
@@ -130,7 +138,7 @@ function renderNav() {
     }
 
     nav.innerHTML = items.map(item => `
-        <button class="nav-item" data-tab="${item.id}" style="width: 100%; text-align: left; padding: 12px 14px; margin-bottom: 6px; background: ${currentTab === item.id ? '#0284c7' : 'transparent'}; color: ${currentTab === item.id ? '#fff' : '#94a3b8'}; border: none; border-radius: 6px; cursor: pointer; font-weight: ${currentTab === item.id ? '600' : 'normal'}; transition: all 0.2s;">
+        <button class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-sm transition-all duration-200 cursor-pointer ${currentTab === item.id ? 'bg-sky-500 text-slate-950 font-bold shadow-lg shadow-sky-500/20' : 'text-slate-400 hover:bg-slate-800/60 hover:text-white'}" data-tab="${item.id}">
           ${item.label}
         </button>
     `).join('');
@@ -153,6 +161,7 @@ function renderApp() {
     else if (currentTab === 'config') renderConfig();
 }
 
+// 1. MÓDULO POS / VENTAS (100% Funcional)
 function renderPos() {
     const pageTitle = document.getElementById('pageTitle');
     const app = document.getElementById('app');
@@ -166,44 +175,45 @@ function renderPos() {
 
     const cartItems = appState.cart.length
         ? appState.cart.map(item => `
-          <div style="display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid #334155;">
+          <div class="flex justify-between items-center py-3 border-b border-slate-800">
             <div>
-              <strong style="color:#f8fafc; font-size:14px;">${safeText(item.name)}</strong><br>
-              <span style="color:#94a3b8; font-size:12px;">${formatCurrency(item.price)} c/u</span>
+              <h4 class="font-semibold text-white text-sm">${safeText(item.name)}</h4>
+              <span class="text-xs text-slate-400">${formatCurrency(item.price)} c/u</span>
             </div>
-            <div style="display:flex; align-items:center; gap:10px;">
-              <button data-action="decrease" data-id="${item.id}" style="padding:4px 10px; background:#334155; color:white; border:none; border-radius:4px; cursor:pointer;">-</button>
-              <span style="font-weight:bold; min-width:20px; text-align:center;">${item.quantity}</span>
-              <button data-action="increase" data-id="${item.id}" style="padding:4px 10px; background:#334155; color:white; border:none; border-radius:4px; cursor:pointer;">+</button>
+            <div class="flex items-center gap-2">
+              <button data-action="decrease" data-id="${item.id}" class="w-7 h-7 bg-slate-800 hover:bg-slate-700 text-white rounded-lg font-bold flex items-center justify-center transition-all">-</button>
+              <span class="w-6 text-center font-bold text-sm text-sky-400">${item.quantity}</span>
+              <button data-action="increase" data-id="${item.id}" class="w-7 h-7 bg-slate-800 hover:bg-slate-700 text-white rounded-lg font-bold flex items-center justify-center transition-all">+</button>
             </div>
           </div>
         `).join('')
-        : '<p style="color: #64748b; text-align:center; padding:40px 0;">No hay ítems en el documento actual.</p>';
+        : '<p class="text-slate-500 text-center py-12 text-sm">No hay ítems en el documento actual.</p>';
 
     app.innerHTML = `
-      <div style="display: grid; grid-template-columns: 1fr 380px; gap: 20px; height: 100%;">
-        <div style="background: #1e293b; padding: 20px; border-radius: 10px; border: 1px solid #334155; display:flex; flex-direction:column;">
-          <h3 style="margin-top:0; color:#38bdf8; font-size:16px; margin-bottom:15px;">Catálogo de Productos y PLU</h3>
-          <div style="flex:1; overflow-y: auto;">
-            <table style="width: 100%; border-collapse: collapse; text-align: left;">
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 h-full">
+        <!-- CATÁLOGO DE PRODUCTOS -->
+        <div class="lg:col-span-2 bg-slate-900 border border-slate-800 rounded-2xl p-5 flex flex-col h-[calc(100vh-140px)]">
+          <h3 class="text-base font-bold text-white mb-4 flex items-center gap-2">📦 Catálogo de Productos y PLU</h3>
+          <div class="flex-1 overflow-y-auto pr-1">
+            <table class="w-full text-left border-collapse">
               <thead>
-                <tr style="border-bottom: 2px solid #334155; color: #94a3b8; font-size: 12px; text-transform:uppercase;">
-                  <th style="padding: 10px;">Producto</th>
-                  <th style="padding: 10px;">Categoría</th>
-                  <th style="padding: 10px;">Stock</th>
-                  <th style="padding: 10px;">Precio</th>
-                  <th style="padding: 10px; text-align:right;">Acción</th>
+                <tr class="border-b border-slate-800 text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+                  <th class="py-3 px-3">Producto</th>
+                  <th class="py-3 px-3">Categoría</th>
+                  <th class="py-3 px-3">Stock</th>
+                  <th class="py-3 px-3">Precio</th>
+                  <th class="py-3 px-3 text-right">Acción</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody class="divide-y divide-slate-800/60 text-sm">
                 ${appState.products.map(product => `
-                  <tr style="border-bottom: 1px solid #334155;">
-                    <td style="padding: 12px 10px; font-weight:500;">${safeText(product.name)}</td>
-                    <td style="padding: 12px 10px; color:#94a3b8; font-size:13px;">${safeText(product.category)}</td>
-                    <td style="padding: 12px 10px;">${product.stock}</td>
-                    <td style="padding: 12px 10px; color:#4ade80; font-weight:600;">${formatCurrency(product.price)}</td>
-                    <td style="padding: 12px 10px; text-align:right;">
-                      <button data-add="${product.id}" style="padding: 6px 14px; background:#0284c7; color:#fff; border:none; border-radius:4px; font-weight:600; cursor:pointer; font-size:12px;">Agregar</button>
+                  <tr class="hover:bg-slate-800/40 transition-colors">
+                    <td class="py-3.5 px-3 font-medium text-white">${safeText(product.name)}</td>
+                    <td class="py-3.5 px-3 text-slate-400 text-xs">${safeText(product.category)}</td>
+                    <td class="py-3.5 px-3 text-slate-300 font-mono">${product.stock}</td>
+                    <td class="py-3.5 px-3 text-emerald-400 font-semibold font-mono">${formatCurrency(product.price)}</td>
+                    <td class="py-3.5 px-3 text-right">
+                      <button data-add="${product.id}" class="px-3 py-1.5 bg-sky-500 hover:bg-sky-400 active:scale-95 text-slate-950 font-bold rounded-lg text-xs transition-all cursor-pointer shadow-md shadow-sky-500/20">Agregar</button>
                     </td>
                   </tr>
                 `).join('')}
@@ -212,31 +222,36 @@ function renderPos() {
           </div>
         </div>
 
-        <div style="background: #1e293b; padding: 20px; border-radius: 10px; border: 1px solid #334155; display: flex; flex-direction: column; justify-content: space-between;">
+        <!-- CARRITO Y TOTALES -->
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 flex flex-col justify-between h-[calc(100vh-140px)]">
           <div>
-            <h3 style="margin-top:0; border-bottom:1px solid #334155; padding-bottom:12px; color:#38bdf8; font-size:16px;">Documento en Curso</h3>
-            <div style="max-height: 280px; overflow-y: auto;">${cartItems}</div>
+            <h3 class="text-base font-bold text-white mb-3 pb-3 border-b border-slate-800 flex items-center gap-2">🛒 Documento en Curso</h3>
+            <div class="max-height-[320px] overflow-y-auto pr-1">${cartItems}</div>
           </div>
           
-          <div style="border-top: 1px solid #334155; padding-top: 15px; margin-top: 15px;">
-            <div style="display:flex; justify-content:space-between; font-size:13px; color:#94a3b8; margin-bottom:5px;">
-              <span>Subtotal:</span><span>${formatCurrency(subtotal)}</span>
+          <div class="pt-4 border-t border-slate-800 mt-4 space-y-2">
+            <div class="flex justify-between text-xs text-slate-400">
+              <span>Subtotal:</span>
+              <span class="font-mono text-white">${formatCurrency(subtotal)}</span>
             </div>
-            <div style="display:flex; justify-content:space-between; font-size:13px; color:#94a3b8; margin-bottom:10px;">
-              <span>IVA (${appState.config.ivaGeneral}%):</span><span>${formatCurrency(ivaAmount)}</span>
+            <div class="flex justify-between text-xs text-slate-400">
+              <span>IVA (${appState.config.ivaGeneral}%):</span>
+              <span class="font-mono text-white">${formatCurrency(ivaAmount)}</span>
             </div>
-            <div style="display:flex; justify-content:space-between; font-size:20px; font-weight:bold; color: #4ade80; margin-bottom:15px;">
-              <span>TOTAL:</span><span>${formatCurrency(totalGeneral)}</span>
+            <div class="flex justify-between text-lg font-bold text-emerald-400 pt-2 border-t border-slate-800">
+              <span>TOTAL:</span>
+              <span class="font-mono">${formatCurrency(totalGeneral)}</span>
             </div>
-            <div style="display:flex; gap:10px;">
-              <button id="checkoutBtn" style="flex:1; padding:12px; background:#16a34a; color:white; font-weight:bold; border:none; border-radius:6px; cursor:pointer; font-size:15px;">PAGAR / FACTURAR</button>
-              <button id="clearCartBtn" style="padding:12px; background:#dc2626; color:white; font-weight:bold; border:none; border-radius:6px; cursor:pointer;">Vaciar</button>
+            <div class="flex gap-2 pt-3">
+              <button id="checkoutBtn" class="flex-1 py-3 px-4 bg-emerald-600 hover:bg-emerald-500 active:scale-[0.98] text-white font-bold rounded-xl shadow-lg shadow-emerald-600/20 transition-all cursor-pointer text-sm">PAGAR / FACTURAR</button>
+              <button id="clearCartBtn" class="py-3 px-4 bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/20 font-bold rounded-xl transition-all cursor-pointer text-sm">Vaciar</button>
             </div>
           </div>
         </div>
       </div>
     `;
 
+    // Eventos POS
     app.querySelectorAll('[data-add]').forEach(btn => {
         btn.addEventListener('click', (e) => {
             const id = Number(e.currentTarget.dataset.add);
@@ -290,6 +305,7 @@ function renderPos() {
     });
 }
 
+// 2. REPORTES FISCALES X/Z
 function renderReportes() {
     const pageTitle = document.getElementById('pageTitle');
     const app = document.getElementById('app');
@@ -297,26 +313,32 @@ function renderReportes() {
     if (!app) return;
     
     app.innerHTML = `
-      <div style="background: #1e293b; padding: 25px; border-radius: 10px; border: 1px solid #334155; max-width: 750px;">
-        <h3 style="color: #38bdf8; margin-top: 0; font-size: 18px;">Módulo de Cierres y Auditoría (Impresora Fiscal)</h3>
-        <p style="color: #94a3b8; font-size: 14px; line-height: 1.5;">Seleccione el tipo de reporte fiscal requerido según normativas legales:</p>
+      <div class="max-w-3xl bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl">
+        <h3 class="text-lg font-bold text-white mb-2">Módulo de Cierres y Auditoría (Impresora Fiscal)</h3>
+        <p class="text-slate-400 text-sm mb-6">Seleccione el tipo de reporte fiscal requerido según normativas legales vigentes:</p>
         
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 25px;">
-          <div style="background:#0f172a; padding:20px; border-radius:8px; border:1px solid #334155;">
-            <h4 style="color:#4ade80; margin-top:0;">Reporte X (Lectura Diaria)</h4>
-            <p style="color:#94a3b8; font-size:13px;">Muestra las ventas totales acumuladas del día sin reiniciar contadores ni memoria fiscal.</p>
-            <button style="width:100%; padding: 12px; background: #0284c7; color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; margin-top:10px;" onclick="alert('Imprimiendo Reporte X en impresora fiscal...')">Generar Reporte X</button>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div class="bg-slate-950 border border-slate-800 rounded-xl p-5 flex flex-col justify-between">
+            <div>
+              <h4 class="font-bold text-emerald-400 text-base mb-2">Reporte X (Lectura Diaria)</h4>
+              <p class="text-slate-400 text-xs leading-relaxed">Muestra las ventas totales acumuladas del día sin reiniciar contadores ni memoria fiscal de la máquina.</p>
+            </div>
+            <button class="mt-5 w-full py-2.5 bg-sky-500 hover:bg-sky-400 text-slate-950 font-bold rounded-xl text-xs transition-all cursor-pointer shadow-md shadow-sky-500/20" onclick="alert('Imprimiendo Reporte X en impresora fiscal...')">Generar Reporte X</button>
           </div>
-          <div style="background:#0f172a; padding:20px; border-radius:8px; border:1px solid #334155;">
-            <h4 style="color:#f87171; margin-top:0;">Reporte Z (Cierre Diario)</h4>
-            <p style="color:#94a3b8; font-size:13px;">Ejecuta el cierre definitivo de caja, reinicia contadores diarios y descarga memoria fiscal.</p>
-            <button style="width:100%; padding: 12px; background: #dc2626; color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; margin-top:10px;" onclick="confirm('¿Está seguro de emitir el Cierre Z? Esta acción es irreversible.') && alert('¡Cierre Z emitido y caja cerrada con éxito!')">Generar Reporte Z</button>
+
+          <div class="bg-slate-950 border border-slate-800 rounded-xl p-5 flex flex-col justify-between">
+            <div>
+              <h4 class="font-bold text-rose-400 text-base mb-2">Reporte Z (Cierre Diario)</h4>
+              <p class="text-slate-400 text-xs leading-relaxed">Ejecuta el cierre definitivo de caja, reinicia contadores diarios y descarga memoria de auditoría.</p>
+            </div>
+            <button class="mt-5 w-full py-2.5 bg-rose-600 hover:bg-rose-500 text-white font-bold rounded-xl text-xs transition-all cursor-pointer shadow-md shadow-rose-600/20" onclick="confirm('¿Está seguro de emitir el Cierre Z? Esta acción es irreversible.') && alert('¡Cierre Z emitido y caja cerrada con éxito!')">Generar Reporte Z</button>
           </div>
         </div>
       </div>
     `;
 }
 
+// 3. INVENTARIO Y PLU (100% Funcional)
 function renderInventory() {
     const pageTitle = document.getElementById('pageTitle');
     const app = document.getElementById('app');
@@ -324,69 +346,55 @@ function renderInventory() {
     if (!app) return;
     
     app.innerHTML = `
-      <div style="display: grid; grid-template-columns: 350px 1fr; gap: 20px;">
-        <div style="background: #1e293b; padding: 20px; border-radius: 10px; border: 1px solid #334155;">
-          <h3 style="color: #38bdf8; margin-top: 0; font-size: 16px;">Registrar Nuevo PLU</h3>
-          <form id="productForm" style="display:flex; flex-direction:column; gap:12px;">
-            <label style="font-size:12px; color:#94a3b8;">Nombre del Producto
-              <input type="text" name="name" required style="width:100%; padding:10px; background:#0f172a; border:1px solid #334155; color:#fff; border-radius:4px; margin-top:4px;">
-            </label>
-            <label style="font-size:12px; color:#94a3b8;">Categoría
-              <input type="text" name="category" required style="width:100%; padding:10px; background:#0f172a; border:1px solid #334155; color:#fff; border-radius:4px; margin-top:4px;">
-            </label>
-            <label style="font-size:12px; color:#94a3b8;">Precio (USD)
-              <input type="number" step="0.01" name="price" required style="width:100%; padding:10px; background:#0f172a; border:1px solid #334155; color:#fff; border-radius:4px; margin-top:4px;">
-            </label>
-            <label style="font-size:12px; color:#94a3b8;">Stock Inicial
-              <input type="number" name="stock" required style="width:100%; padding:10px; background:#0f172a; border:1px solid #334155; color:#fff; border-radius:4px; margin-top:4px;">
-            </label>
-            <button type="submit" style="padding: 12px; background: #16a34a; color: white; font-weight: bold; border: none; border-radius: 6px; cursor: pointer; margin-top:10px;">Guardar Producto</button>
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5">
+          <h3 class="text-base font-bold text-white mb-4">Registrar Nuevo PLU</h3>
+          <form id="productForm" class="space-y-4">
+            <div>
+              <label class="block text-xs font-medium text-slate-400 mb-1">Nombre del Producto</label>
+              <input type="text" name="name" required class="w-full px-3 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-white text-sm focus:ring-2 focus:ring-sky-500 focus:outline-none">
+            </div>
+            <div>
+              <label class="block text-xs font-medium text-slate-400 mb-1">Categoría</label>
+              <input type="text" name="category" required class="w-full px-3 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-white text-sm focus:ring-2 focus:ring-sky-500 focus:outline-none">
+            </div>
+            <div>
+              <label class="block text-xs font-medium text-slate-400 mb-1">Precio (USD)</label>
+              <input type="number" step="0.01" name="price" required class="w-full px-3 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-white text-sm focus:ring-2 focus:ring-sky-500 focus:outline-none">
+            </div>
+            <div>
+              <label class="block text-xs font-medium text-slate-400 mb-1">Stock Inicial</label>
+              <input type="number" name="stock" required class="w-full px-3 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-white text-sm focus:ring-2 focus:ring-sky-500 focus:outline-none">
+            </div>
+            <button type="submit" class="w-full py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl text-sm transition-all cursor-pointer shadow-lg shadow-emerald-600/20">Guardar Producto</button>
           </form>
         </div>
 
-        <div style="background: #1e293b; padding: 20px; border-radius: 10px; border: 1px solid #334155;">
-          <h3 style="color: #38bdf8; margin-top: 0; font-size: 16px;">Listado de Productos Registrados</h3>
-          <div style="max-height: 450px; overflow-y:auto;">
-            <table style="width: 100%; border-collapse: collapse; text-align: left;">
+        <div class="lg:col-span-2 bg-slate-900 border border-slate-800 rounded-2xl p-5">
+          <h3 class="text-base font-bold text-white mb-4">Listado de Productos Registrados</h3>
+          <div class="max-h-[450px] overflow-y-auto pr-1">
+            <table class="w-full text-left border-collapse">
               <thead>
-                <tr style="border-bottom: 2px solid #334155; color: #94a3b8; font-size: 12px;">
-                  <th style="padding: 10px;">ID</th>
-                  <th style="padding: 10px;">Nombre</th>
-                  <th style="padding: 10px;">Categoría</th>
-                  <th style="padding: 10px;">Precio</th>
-                  <th style="padding: 10px;">Stock</th>
-                  <th style="padding: 10px; text-align:right;">Acción</th>
+                <tr class="border-b border-slate-800 text-[11px] font-bold text-slate-400 uppercase">
+                  <th class="py-3 px-3">ID</th>
+                  <th class="py-3 px-3">Nombre</th>
+                  <th class="py-3 px-3">Categoría</th>
+                  <th class="py-3 px-3">Precio</th>
+                  <th class="py-3 px-3">Stock</th>
+                  <th class="py-3 px-3 text-right">Acción</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody class="divide-y divide-slate-800/60 text-sm">
                 ${appState.products.map(product => `
-                  <tr style="border-bottom: 1px solid #334155;">
-                    <td style="padding: 10px; color:#94a3b8;">${product.id}</td>
-                    <td style="padding: 10px; font-weight:500;">${safeText(product.name)}</td>
-                    <td style="padding: 10px; color:#94a3b8;">${safeText(product.category)}</td>
-                    <td style="padding: 10px; color:#4ade80;">${formatCurrency(product.price)}</td>
-                    <td style="padding: 10px;">${product.stock}</td>
-                    <td style="padding: 10px; text-align:right;">
-                      <button data-delete-prod="${product.id}" style="padding: 5px 10px; background:#dc2626; color:#fff; border:none; border-radius:4px; cursor:pointer; font-size:11px;">Eliminar</button>
+                  <tr class="hover:bg-slate-800/40">
+                    <td class="py-3 px-3 text-slate-500 text-xs font-mono">${product.id}</td>
+                    <td class="py-3 px-3 font-medium text-white">${safeText(product.name)}</td>
+                    <td class="py-3 px-3 text-slate-400 text-xs">${safeText(product.category)}</td>
+                    <td class="py-3 px-3 text-emerald-400 font-semibold font-mono">${formatCurrency(product.price)}</td>
+                    <td class="py-3 px-3 text-slate-300 font-mono">${product.stock}</td>
+                    <td class="py-3 px-3 text-right">
+                      <button data-delete-prod="${product.id}" class="px-2.5 py-1 bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/20 rounded-lg text-xs font-bold transition-all cursor-pointer">Eliminar</button>
                     </td>
                   </tr>
                 `).join('')}
               </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-    `;
-
-    document.getElementById('productForm').addEventListener('submit', (e) => {
-        e.preventDefault();
-        const form = e.currentTarget;
-        const newProd = {
-            id: Date.now(),
-            name: form.name.value.trim(),
-            category: form.category.value.trim(),
-            price: Number(form.price.value),
-            stock: Number(form.stock.value)
-        };
-        appState.products.push(newProd);
-        saveState();
