@@ -1,68 +1,105 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" class="h-full bg-slate-950">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Nexus ERP Pro - Sistema Fiscal POS</title>
+    <!-- Tailwind CSS CDN v4 -->
+    <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="styles.css" />
   </head>
-  <body style="background: #0f172a; color: #f8fafc; font-family: sans-serif; margin: 0; padding: 0;">
+  <body class="h-full text-slate-100 font-sans antialiased overflow-hidden">
 
-    <!-- PANTALLA DE ACCESO -->
-    <div id="pantalla-login" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #0f172a; display: flex; justify-content: center; align-items: center; z-index: 99999;">
-        <div style="background: #1e293b; padding: 30px; border-radius: 10px; width: 340px; text-align: center; border: 1px solid #334155;">
-            <h2 style="color: #38bdf8; margin-bottom: 5px;">Nexus ERP Pro</h2>
-            <p style="color: #94a3b8; font-size: 12px; margin-bottom: 20px;">Control Fiscal y POS</p>
+    <!-- PANTALLA DE ACCESO (LOGIN) -->
+    <div id="pantalla-login" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/90 backdrop-blur-md">
+        <div class="w-full max-w-md p-8 bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl shadow-sky-500/10 text-center">
+            <div class="inline-flex items-center justify-center w-14 h-14 rounded-xl bg-sky-500/10 text-sky-400 font-bold text-2xl mb-4 border border-sky-500/20">
+              N
+            </div>
+            <h2 class="text-2xl font-bold tracking-tight text-white mb-1">Nexus ERP Pro</h2>
+            <p class="text-xs text-slate-400 uppercase tracking-widest mb-6">Control Fiscal y Punto de Venta</p>
             
-            <input type="text" id="u-login" placeholder="Código de Usuario / Cédula (admin / cajero)" style="width: 100%; padding: 10px; margin-bottom: 12px; background: #0f172a; color: white; border: 1px solid #334155; border-radius: 4px; box-sizing: border-box;"><br>
-            <input type="password" id="p-login" placeholder="Clave de Acceso (1234)" style="width: 100%; padding: 10px; margin-bottom: 15px; background: #0f172a; color: white; border: 1px solid #334155; border-radius: 4px; box-sizing: border-box;"><br>
-            
-            <select id="modo-selector" style="width: 100%; padding: 10px; margin-bottom: 20px; background: #0f172a; color: white; border: 1px solid #334155; border-radius: 4px;">
-                <option value="pos">Modo Fiscal / Ventas (POS)</option>
-                <option value="reporte">Modo Reporte (Fiscal X/Z)</option>
-                <option value="set">Modo Set (Administrativo)</option>
-            </select><br>
+            <div class="space-y-4 text-left">
+                <div>
+                    <label class="block text-xs font-medium text-slate-400 mb-1">Usuario / Cédula / Código</label>
+                    <input type="text" id="u-login" placeholder="Ej. admin o cajero" class="w-full px-4 py-3 bg-slate-950 border border-slate-800 rounded-xl text-white placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-transparent transition-all">
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-slate-400 mb-1">Clave de Acceso</label>
+                    <input type="password" id="p-login" placeholder="••••" class="w-full px-4 py-3 bg-slate-950 border border-slate-800 rounded-xl text-white placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-transparent transition-all">
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-slate-400 mb-1">Modo de Ingreso</label>
+                    <select id="modo-selector" class="w-full px-4 py-3 bg-slate-950 border border-slate-800 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-transparent transition-all">
+                        <option value="pos">🛒 Modo Fiscal / Ventas (POS)</option>
+                        <option value="reporte">📊 Modo Reporte (Fiscal X/Z)</option>
+                        <option value="set">⚙️ Modo Set (Administrativo)</option>
+                    </select>
+                </div>
+            </div>
 
-            <button id="btn-entrar-sistema" style="width: 100%; padding: 12px; background: #38bdf8; color: #0f172a; font-weight: bold; cursor: pointer; border: none; border-radius: 5px;">Entrar al Sistema</button>
-            <p id="error-login" style="color: #f87171; font-size: 13px; display: none; margin-top: 10px;">Credenciales incorrectas</p>
+            <button id="btn-entrar-sistema" class="w-full mt-6 py-3 px-4 bg-sky-500 hover:bg-sky-400 active:scale-[0.98] text-slate-950 font-bold rounded-xl shadow-lg shadow-sky-500/25 transition-all duration-200 cursor-pointer">
+                Entrar al Sistema
+            </button>
+            <p id="error-login" class="hidden text-rose-400 text-xs mt-3 font-medium">Credenciales incorrectas. Verifique e intente de nuevo.</p>
         </div>
     </div>
 
-    <!-- CONTENEDOR PRINCIPAL DEL ERP -->
-    <div id="sistema-contenido" style="display: none; width: 100vw; height: 100vh;">
-      <div class="app-shell" style="display: flex; width: 100%; height: 100%;">
-        
-        <!-- BARRA LATERAL (El menú se inyecta aquí automáticamente) -->
-        <aside class="sidebar" style="width: 260px; background: #1e293b; border-right: 1px solid #334155; padding: 20px; display: flex; flex-direction: column;">
-          <div class="brand" style="margin-bottom: 30px;">
-            <h1 style="font-size: 18px; margin: 0; color: #38bdf8;">Nexus ERP</h1>
-            <small style="color: #94a3b8;">POS & ERP Fiscal</small>
+    <!-- CONTENEDOR PRINCIPAL DEL ERP (Oculto hasta iniciar sesión) -->
+    <div id="sistema-contenido" class="hidden h-full w-full flex bg-slate-950">
+      
+      <!-- BARRA LATERAL (SIDEBAR) -->
+      <aside class="w-64 bg-slate-900 border-r border-slate-800 flex flex-col justify-between p-5 select-none">
+        <div>
+          <div class="flex items-center gap-3 mb-8 px-2">
+            <div class="w-10 h-10 rounded-xl bg-sky-500 flex items-center justify-center font-bold text-slate-950 text-lg shadow-md shadow-sky-500/30">
+              N
+            </div>
+            <div>
+              <h1 class="font-bold text-white text-base tracking-wide">Nexus ERP</h1>
+              <span class="text-[10px] font-semibold uppercase tracking-wider text-sky-400">POS & Fiscal Core</span>
+            </div>
           </div>
           
-          <nav id="nav" class="nav" style="flex: 1;"></nav>
+          <nav id="nav" class="space-y-1.5">
+            <!-- Los elementos del menú se cargan automáticamente desde app.js -->
+          </nav>
+        </div>
 
+        <div class="pt-4 border-t border-slate-800">
+          <button id="btnLogout" class="w-full flex items-center justify-center gap-2 py-2.5 px-4 bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/20 rounded-xl font-semibold text-sm transition-all duration-200 active:scale-[0.98] cursor-pointer">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+            Cerrar Sesión
+          </button>
+        </div>
+      </aside>
+
+      <!-- ÁREA PRINCIPAL -->
+      <main class="flex-1 flex flex-col h-full overflow-hidden bg-slate-950">
+        
+        <!-- BARRA SUPERIOR (TOPBAR) -->
+        <header class="h-16 bg-slate-900/80 backdrop-blur-md border-b border-slate-800 flex items-center justify-between px-6 z-10">
           <div>
-            <button id="btnLogout" class="danger-btn" style="width: 100%; padding: 10px; background: #ef4444; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;">Cerrar Sesión</button>
+            <p class="text-[10px] uppercase tracking-wider text-sky-400 font-semibold">Panel de Operaciones</p>
+            <h2 id="pageTitle" class="text-lg font-bold text-white tracking-tight">Terminal POS</h2>
           </div>
-        </aside>
-
-        <!-- CONTENIDO PRINCIPAL -->
-        <main class="content" style="flex: 1; display: flex; flex-direction: column; background: #0f172a; overflow-y: auto;">
-          <header class="topbar" style="display: flex; justify-content: space-between; align-items: center; background: #1e293b; padding: 15px 25px; border-bottom: 1px solid #334155;">
-            <div>
-              <p class="eyebrow" style="color: #38bdf8; margin: 0; font-size: 12px;">Panel principal</p>
-              <h2 id="pageTitle" style="margin: 0; font-size: 18px;">Dashboard</h2>
+          
+          <div class="flex items-center gap-4">
+            <div class="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-emerald-500/10 border border-emerald-500/20 rounded-full text-emerald-400 text-xs font-medium">
+              <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+              Impresora Fiscal: Conectada
             </div>
-            <div class="status-row" style="display: flex; align-items: center; gap: 15px;">
-              <span style="font-size: 11px; color: #4ade80;">Impresora Fiscal: Conectada 🟢</span>
-              <span id="reloj-sistema" style="font-size: 13px; background: #0f172a; padding: 6px 12px; border-radius: 4px; border: 1px solid #334155;">--:--:--</span>
+            <div id="reloj-sistema" class="px-3 py-1.5 bg-slate-950 border border-slate-800 rounded-xl text-slate-300 font-mono text-xs shadow-inner">
+              --:--:--
             </div>
-          </header>
+          </div>
+        </header>
 
-          <!-- Las vistas (POS, Inventario, Reportes, etc.) se inyectan aquí -->
-          <section id="app" class="app-view" style="padding: 25px; flex: 1;"></section>
-        </main>
-      </div>
+        <!-- VISTAS DINÁMICAS -->
+        <section id="app" class="flex-1 overflow-y-auto p-6 bg-slate-950">
+          <!-- El contenido del ERP se inyecta dinámicamente aquí -->
+        </section>
+      </main>
     </div>
 
     <script src="app.js"></script>
