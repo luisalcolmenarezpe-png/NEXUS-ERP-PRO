@@ -13,20 +13,17 @@
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
-    <!-- PANTALLA DE ACCESO N NEXUS ERP -->
-<div id="pantalla-login" class="login-overlay" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #0f172a; display: flex; justify-content: center; align-items: center; z-index: 99999;">
-    <div style="background: #1e293b; padding: 30px; border-radius: 10px; width: 320px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.5);">
+<!-- PANTALLA DE ACCESO -->
+<div id="pantalla-login" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #0f172a; display: flex; justify-content: center; align-items: center; z-index: 99999;">
+    <div style="background: #1e293b; padding: 30px; border-radius: 10px; width: 320px; text-align: center;">
         <h2 style="color: #38bdf8; margin-bottom: 10px;">Nexus ERP Pro</h2>
-        <p style="color: #94a3b8; font-size: 14px; margin-bottom: 20px;">Control de Acceso</p>
-        
-        <input type="text" id="usuario-login" placeholder="Usuario (admin o cajero)" style="width: 100%; padding: 10px; margin-bottom: 12px; background: #0f172a; color: white; border: 1px solid #334155; border-radius: 5px;">
-        <input type="password" id="password-login" placeholder="Contraseña (1234)" style="width: 100%; padding: 10px; margin-bottom: 20px; background: #0f172a; color: white; border: 1px solid #334155; border-radius: 5px;">
-        
-        <button id="btn-entrar" style="width: 100%; padding: 10px; background: #38bdf8; color: #0f172a; font-weight: bold; border: none; border-radius: 5px; cursor: pointer;">Entrar</button>
-        <p id="error-login-txt" style="color: #f87171; font-size: 13px; display: none; margin-top: 10px;">Usuario o contraseña incorrectos</p>
+        <input type="text" id="u-login" placeholder="Usuario" style="width: 100%; padding: 10px; margin-bottom: 12px; background: #0f172a; color: white; border: 1px solid #334155;"><br>
+        <input type="password" id="p-login" placeholder="Contraseña" style="width: 100%; padding: 10px; margin-bottom: 20px; background: #0f172a; color: white; border: 1px solid #334155;"><br>
+        <button id="btn-entrar-sistema" style="width: 100%; padding: 10px; background: #38bdf8; font-weight: bold; cursor: pointer; border: none; border-radius: 5px;">Entrar</button>
+        <p id="error-login" style="color: #f87171; font-size: 13px; display: none; margin-top: 10px;">Usuario o contraseña incorrectos</p>
     </div>
 </div>
-
+<div id="contenido-erp" style="display: none;">
 <!-- CONTENEDOR PRINCIPAL DE TU ERP (Oculto al inicio) -->
 <div id="sistema-contenido" style="display: none;">
     <div id="authScreen" class="auth-screen">
