@@ -3,15 +3,23 @@ document.addEventListener("DOMContentLoaded", function() {
     const passInput = document.getElementById('p-login');
 
     function ejecutarLogin() {
-        const u = document.getElementById('u-login').value.toLowerCase().trim();
-        const p = document.getElementById('p-login').value.trim();
+        const uInput = document.getElementById('u-login');
+        const pInput = document.getElementById('p-login');
         const errorP = document.getElementById('error-login');
+        
+        if (!uInput || !pInput) return;
+
+        const u = uInput.value.toLowerCase().trim();
+        const p = pInput.value.trim();
         
         if (errorP) errorP.style.display = 'none';
 
         if (p === "1234" && (u === "admin" || u === "cajero")) {
-            document.getElementById('pantalla-login').style.display = 'none';
-            document.getElementById('contenido-erp').style.display = 'block';
+            const pantallaLogin = document.getElementById('pantalla-login');
+            const sistemaContenido = document.getElementById('sistema-contenido');
+            
+            if (pantallaLogin) pantallaLogin.style.display = 'none';
+            if (sistemaContenido) sistemaContenido.style.display = 'block';
             
             if (u === "cajero") {
                 const ocultarCajero = ['menu-inventario', 'menu-finanzas', 'menu-clientes'];
