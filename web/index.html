@@ -14,7 +14,7 @@
               hrbg: '#0b0f15',
               hrcard: '#161b26',
               hrborder: '#212a3b',
-              hractive: '#2dd4bf', // Verde menta neón exacto
+              hractive: '#2dd4bf',
             }
           }
         }
@@ -23,8 +23,8 @@
   </head>
   <body class="h-full text-slate-100 font-sans antialiased overflow-hidden bg-hrbg">
 
-    <!-- MÓDULO DE LOGIN (Glassmorphism Neón) -->
-    <div id="login-container"></div>
+    <!-- MÓDULO DE LOGIN (Corregido con h-full w-full) -->
+    <div id="login-container" class="h-full w-full absolute inset-0 z-50"></div>
 
     <!-- CONTENEDOR PRINCIPAL DEL ERP (Oculto hasta hacer login) -->
     <div id="sistema-contenido" class="hidden h-full w-full flex bg-hrbg">
@@ -32,7 +32,6 @@
       <!-- BARRA LATERAL (SIDEBAR) -->
       <aside class="w-64 bg-hrcard border-r border-hrborder flex flex-col justify-between p-5 select-none shadow-2xl">
         <div>
-          <!-- Logo con brillo Neón -->
           <div class="flex items-center gap-3 mb-6 px-2">
             <div class="w-10 h-10 rounded-xl bg-[#2dd4bf] flex items-center justify-center font-bold text-slate-950 text-lg shadow-[0_0_20px_rgba(45,212,191,0.35)]">
               N
@@ -43,7 +42,6 @@
             </div>
           </div>
 
-          <!-- Buscador lateral estilo HRFlowBoard -->
           <div class="mb-6 px-1">
             <div class="relative">
               <input type="text" placeholder="Search modules..." class="w-full bg-[#0b0f15] border border-hrborder rounded-xl px-3 py-2 text-xs text-slate-300 placeholder-slate-500 focus:outline-none focus:border-[#2dd4bf] transition-all">
@@ -51,12 +49,10 @@
             </div>
           </div>
           
-          <!-- Menú Dinámico Inyectado por app.js -->
           <div class="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2 px-3">Main Menu</div>
           <nav id="nav" class="space-y-1.5"></nav>
         </div>
 
-        <!-- Botón de Salida -->
         <div class="pt-4 border-t border-hrborder">
           <button id="btnLogout" class="w-full flex items-center justify-center gap-2 py-2.5 px-4 bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/20 rounded-xl font-semibold text-xs transition-all cursor-pointer">
             Cerrar Sesión
@@ -67,7 +63,6 @@
       <!-- ÁREA DE TRABAJO PRINCIPAL -->
       <main class="flex-1 flex flex-col h-full overflow-hidden bg-hrbg">
         
-        <!-- BARRA SUPERIOR -->
         <header class="h-16 bg-hrcard/60 backdrop-blur-md border-b border-hrborder flex items-center justify-between px-8 z-10">
           <div>
             <p class="text-[10px] uppercase tracking-widest text-[#2dd4bf] font-bold">Terminal Activo</p>
@@ -85,14 +80,13 @@
           </div>
         </header>
 
-        <!-- CONTENEDOR DINÁMICO DE VISTAS (Inyecta Dashboard, POS, Inventario, etc.) -->
         <section id="app" class="flex-1 overflow-y-auto p-8 bg-hrbg space-y-6">
           <!-- Contenido modular -->
         </section>
       </main>
     </div>
 
-    <!-- ENTRADA AL CEREBRO ES MODULES -->
+    <!-- SCRIPT PRINCIPAL -->
     <script type="module" src="js/app.js"></script>
   </body>
 </html>
