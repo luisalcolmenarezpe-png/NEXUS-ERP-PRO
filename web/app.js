@@ -12,23 +12,21 @@ let appState = loadState();
 let currentTab = 'dashboard';
 let currentUserRole = 'cajero';
 
-document.addEventListener("DOMContentLoaded", function() {
-    // Reloj del sistema en tiempo real
-    setInterval(() => {
-        const reloj = document.getElementById('reloj-sistema');
-        if (reloj) reloj.innerText = new Date().toLocaleTimeString();
-    }, 1000);
+// Reloj del sistema en tiempo real
+setInterval(() => {
+    const reloj = document.getElementById('reloj-sistema');
+    if (reloj) reloj.innerText = new Date().toLocaleTimeString();
+}, 1000);
 
-    // Arrancar mostrando el microarchivo de Login
-    renderLogin((usuario, modo) => {
-        currentUserRole = usuario.toLowerCase().includes("admin") ? 'admin' : 'cajero';
-        currentTab = modo === 'set' ? 'config' : (modo === 'reporte' ? 'reportes' : 'dashboard');
-        initApp();
-    });
-
-    // Botón de Cerrar Sesión
-    document.getElementById('btnLogout')?.addEventListener('click', () => location.reload());
+// Arrancar mostrando el microarchivo de Login inmediatamente
+renderLogin((usuario, modo) => {
+    currentUserRole = usuario.toLowerCase().includes("admin") ? 'admin' : 'cajero';
+    currentTab = modo === 'set' ? 'config' : (modo === 'reporte' ? 'reportes' : 'dashboard');
+    initApp();
 });
+
+// Botón de Cerrar Sesión
+document.getElementById('btnLogout')?.addEventListener('click', () => location.reload());
 
 function initApp() {
     renderNav();
