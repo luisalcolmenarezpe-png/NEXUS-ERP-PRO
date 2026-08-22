@@ -8,22 +8,30 @@ import { renderCustomers } from './customers.js';
 import { renderReportes } from './reports.js';
 import { renderConfig } from './config.js';
 
+console.log("Nexus ERP Core Iniciado 🟢");
+
 let appState = loadState();
 let currentTab = 'dashboard';
 let currentUserRole = 'cajero';
 
-// Reloj del sistema en tiempo real
+// Reloj del sistema
 setInterval(() => {
     const reloj = document.getElementById('reloj-sistema');
     if (reloj) reloj.innerText = new Date().toLocaleTimeString();
 }, 1000);
 
-// Arrancar mostrando el microarchivo de Login inmediatamente
-renderLogin((usuario, modo) => {
-    currentUserRole = usuario.toLowerCase().includes("admin") ? 'admin' : 'cajero';
-    currentTab = modo === 'set' ? 'config' : (modo === 'reporte' ? 'reportes' : 'dashboard');
-    initApp();
-});
+// Forzar renderizado del Login
+const loginContainer = document.getElementById('login-container');
+if (loginContainer) {
+    loginContainer.style.display = 'block';
+    renderLogin((usuario, modo) => {
+        currentUserRole = usuario.toLowerCase().includes("admin") ? 'admin' : 'cajero';
+        currentTab = modo === 'set' ? 'config' : (modo === 'reporte' ? 'reportes' : 'dashboard');
+        initApp();
+    });
+} else {
+    console.error("No se encontró el contenedor de login en el HTML.");
+}
 
 // Botón de Cerrar Sesión
 document.getElementById('btnLogout')?.addEventListener('click', () => location.reload());
